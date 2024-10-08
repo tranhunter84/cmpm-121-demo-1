@@ -10,7 +10,7 @@ header.innerHTML = gameName;
 app.append(header);
 
 // Counter variable
-let counter : number = 0;
+let counter: number = 0;
 
 // Div that reports the counter's value
 const reportedCount = document.createElement("div");
@@ -21,7 +21,13 @@ app.append(reportedCount);
 const button = document.createElement("button");
 button.innerHTML = "BOO! Click me! 🎃";
 button.onclick = () => {
-    counter += 1;
-    reportedCount.innerHTML = counter + " Jack-o'-Lanterns!"; // Update the div with the new counter value
+  counter += 1;
+  reportedCount.innerHTML = counter + " Jack-o'-Lanterns!"; // Update the div with the new counter value
 };
 app.append(button);
+
+// Increase the counter by 1 each second (in addition to the clicks)
+const secondIncrement = setInterval(() => {
+  counter += 1;
+  reportedCount.innerHTML = counter + " Jack-o'-Lanterns!"; // Update the div with the new counter value
+}, 1000);
