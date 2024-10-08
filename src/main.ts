@@ -27,7 +27,7 @@ button.onclick = () => {
 app.append(button);
 
 // Increase the counter by 1 each second (in addition to the clicks)
-const secondIncrement = setInterval(() => {
+setInterval(() => {
   counter += 1;
   reportedCount.innerHTML = counter + " Jack-o'-Lanterns!"; // Update the div with the new counter value
 }, 1000);
