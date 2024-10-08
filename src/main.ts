@@ -21,13 +21,21 @@ app.append(reportedCount);
 const button = document.createElement("button");
 button.innerHTML = "BOO! Click me! 🎃";
 button.onclick = () => {
-  counter += 1;
-  reportedCount.innerHTML = counter + " Jack-o'-Lanterns!"; // Update the div with the new counter value
+    counter += 1;
+    reportedCount.innerHTML = counter + " Jack-o'-Lanterns!"; // Update the div with the new counter value
 };
 app.append(button);
 
-// Increase the counter by 1 each second (in addition to the clicks)
-setInterval(() => {
-  counter += 1;
-  reportedCount.innerHTML = counter + " Jack-o'-Lanterns!"; // Update the div with the new counter value
-}, 1000);
+// Update counter based on animation frame
+// Counter increments by fractional amount (1 sec -> 1 unit)
+let timeStamp: number = 0;
+function updateCounter(timestamp: number) {
+    if (timeStamp) {
+        const elapsed = timestamp - timeStamp;
+        counter += elapsed / 1000; 
+        reportedCount.innerHTML = counter.toFixed(2) + " Jack-o'-Lanterns!"; 
+    }
+    timeStamp = timestamp;
+    requestAnimationFrame(updateCounter); 
+}
+requestAnimationFrame(updateCounter);
