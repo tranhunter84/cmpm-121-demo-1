@@ -20,7 +20,6 @@ const upgradeCounts = {
   upgrade3: 0,
 };
 
-// Track current costs of each upgrade 
 const costs = {'upgrade1': 10, 'upgrade2': 100, 'upgrade3': 1000}
 
 // Add DIVs to report different values to the user
@@ -28,11 +27,9 @@ const costs = {'upgrade1': 10, 'upgrade2': 100, 'upgrade3': 1000}
 const reportedCount = document.createElement("div");
 const reportedGrowth = document.createElement("div");
 const reportedPurchases = document.createElement("div");
-const purchasableUpgrades = document.createElement("div");
 app.append(reportedCount);
 app.append(reportedGrowth);
 app.append(reportedPurchases);
-app.append(purchasableUpgrades);
 
 // Function to keep the DIVs updated with current values
 function updateReportedValues() {
@@ -47,28 +44,12 @@ function updateReportedValues() {
     ", lv.3: " +
     upgradeCounts['upgrade3'] +
     "]";
-    purchasableUpgrades.innerHTML =   "PURCHASBLE UPGRADES:" +"<br />"
-                                    + "Growth Rate Upgrade lv. 1 | Cost: " +costs['upgrade1']+ " Jack-o'-Lanterns" +"<br />"
-                                    + "Growth Rate Upgrade lv. 2 | Cost: " +costs['upgrade2']+ " Jack-o'-Lanterns" +"<br />"
-                                    + "Growth Rate Upgrade lv. 3 | Cost: " +costs['upgrade3']+ " Jack-o'-Lanterns"
 }
 updateReportedValues();
 
-function updateUpgradeButtons() {
-  const upgrades = [
-    { button: upgradeButton1, cost: costs['upgrade1'] },
-    { button: upgradeButton2, cost: costs['upgrade2'] },
-    { button: upgradeButton3, cost: costs['upgrade3'] }
-  ];
-
-  upgrades.forEach(({ button, cost }) => {
-    button.disabled = clicksCounter < cost;
-  });
-}
-
 // 3 Upgrade buttons for increasing growth rate
 // Helper function to create an upgrade button
-function createUpgradeButton(label: string, growth: number, upgradeKey: keyof typeof upgradeCounts) {
+function createUpgradeButton(label: string, initialCost: number, growth: number, upgradeKey: keyof typeof upgradeCounts) {
   const button = document.createElement("button");
   button.innerHTML = label;
   button.disabled = true;
@@ -77,7 +58,7 @@ function createUpgradeButton(label: string, growth: number, upgradeKey: keyof ty
           clicksCounter -= costs[upgradeKey]; 
           growthRate += growth; 
           upgradeCounts[upgradeKey] += 1; 
-          costs[upgradeKey] = Math.round(costs[upgradeKey] * 1.15 * 100) / 100;
+          costs[upgradeKey] = Math.floor(costs[upgradeKey] * 1.15); 
           updateReportedValues(); 
           updateUpgradeButtons(); 
       }
@@ -87,19 +68,22 @@ function createUpgradeButton(label: string, growth: number, upgradeKey: keyof ty
 
 // Define individual upgrade buttons using the respective upgrade counts
 const upgradeButton1 = createUpgradeButton(
-"Buy growth rate upgrade lv. 1",  
+"Buy growth rate upgrade lv. 1 (Cost: 10 Jack-o'-Lanterns)", 
+10, 
 0.1, 
 'upgrade1'
 );
 
 const upgradeButton2 = createUpgradeButton(
-"Buy growth rate upgrade lv. 2",  
+"Buy growth rate upgrade lv. 2 (Cost: 100 Jack-o'-Lanterns)", 
+100, 
 2, 
 'upgrade2'
 );
 
 const upgradeButton3 = createUpgradeButton(
-"Buy growth rate upgrade lv. 3",  
+"Buy growth rate upgrade lv. 3 (Cost: 1000 Jack-o'-Lanterns)", 
+1000, 
 50, 
 'upgrade3'
 );
@@ -117,6 +101,24 @@ app.append(clicksButton);
 app.append(upgradeButton1);
 app.append(upgradeButton2);
 app.append(upgradeButton3);
+
+
+function updateUpgradeButtons() {
+  const upgrades = [
+    { button: upgradeButton1, cost: costs['upgrade1'] },
+    { button: upgradeButton2, cost: costs['upgrade2'] },
+    { button: upgradeButton3, cost: costs['upgrade3'] }
+  ];
+
+  upgrades.forEach(({ button, cost }) => {
+    button.disabled = clicksCounter < cost;
+  });
+
+  //upgradeButton1.innerHTML = "Buy growth rate upgrade lv. 1 (Cost: " +costs['upgrade1']+ " Jack-o'-Lanterns)";
+  //upgradeButton2.innerHTML = "Buy growth rate upgrade lv. 2 (Cost: " +costs['upgrade2']+ " Jack-o'-Lanterns)";
+  //upgradeButton3.innerHTML = "Buy growth rate upgrade lv. 3 (Cost: " +costs['upgrade3']+ " Jack-o'-Lanterns)";
+}
+
 
 // Update counter based on animation frame
 // Counter increments by fractional amount (1 sec -> 1 unit)
