@@ -1,23 +1,23 @@
-// ===================================
-// BASIC APP HEADERS & STYLING
+// ================================
+// APP SETUP AND INITIAL STYLING
 import "./style.css";
 const app: HTMLDivElement = document.querySelector("#app")!;
 
-const gameName = "Jack-O'-Lantern Farmer!!"; // Page title
+const gameName = "Jack-O'-Lantern Farmer!!"; // Set page title
 document.title = gameName;
 
-const header = document.createElement("h1"); // Header
+const header = document.createElement("h1"); // Create header element
 header.innerHTML = gameName;
 app.append(header);
 
-// ===================================
-// CONFIGURATION AND CONSTANTS
+// ================================
+// GAME CONFIGURATION AND CONSTANTS
 const ITEM_DETAILS = [
-  { name: "seeds", cost: 10, rate: 0.1, desc: "A small busshel of pumpkin seeds...Great for beginners." },
-  { name: "patch", cost: 100, rate: 2, desc: "A booming pumpkin patch located in Half Moon Bay California." },
+  { name: "seeds", cost: 10, rate: 0.1, desc: "A small bushel of pumpkin seeds... Great for beginners." },
+  { name: "patch", cost: 100, rate: 2, desc: "A booming pumpkin patch located in Half Moon Bay, California." },
   { name: "farm", cost: 1000, rate: 50, desc: "A well-maintained pumpkin farm, for sale from Farmer Otis." },
-  { name: "lab", cost: 2000, rate: 100, desc: "A cutting-edge science lab where artificially created GMO pumpkins are produced." },
-  { name: "forest", cost: 10000, rate: 1000, desc: "A mythical forest said to be filled with haunted spirits...and..the most delectable pumpkins." }
+  { name: "lab", cost: 2000, rate: 100, desc: "A cutting-edge science lab where GMO pumpkins are produced." },
+  { name: "forest", cost: 10000, rate: 1000, desc: "A mythical forest filled with haunted spirits... and the best pumpkins." }
 ];
 
 const BUTTON_STYLE = {
@@ -35,11 +35,11 @@ const BUTTON_STYLE = {
   paddingTop: "70px"
 };
 
-// ===================================
-// INITIALIZATION OF CORE VARIABLES
-let lanternCounter: number = 0,
-    lanternGrowthRate: number = 0;
-let timeStamp: number = 0;
+// ================================
+// INITIAL GAME STATE VARIABLES
+let lanternCounter: number = 0,      // Current number of lanterns
+    lanternGrowthRate: number = 0;   // Growth rate of lanterns per second
+let timeStamp: number = 0;           // Timestamp for tracking elapsed time
 
 interface Item {
   name: string;
@@ -51,23 +51,25 @@ interface Item {
 
 const availableItems: Item[] = ITEM_DETAILS.map(item => ({
   ...item,
-  sold: 0
+  sold: 0   // Add 'sold' property to track number of purchases
 }));
 
-// ===================================
-// PAGE ELEMENTS FOR STATE-TRACKING
-const reportedCount = document.createElement("div");
-const reportedGrowth = document.createElement("div");
-const reportedPurchases = document.createElement("div");
-const purchasableUpgrades = document.createElement("div");
+// ================================
+// GAME STATE DISPLAY ELEMENTS
+const reportedCount = document.createElement("div");         // Displays lantern count
+const reportedGrowth = document.createElement("div");        // Displays growth rate
+const reportedPurchases = document.createElement("div");     // Displays item purchases
+const purchasableUpgrades = document.createElement("div");   // Displays available upgrades
+
 app.appendChild(document.createElement("div")).innerHTML = "🎃";
 app.append(reportedCount);
 app.append(reportedGrowth);
 app.append(reportedPurchases);
 app.append(purchasableUpgrades);
 
-// ===================================
+// ================================
 // HELPER FUNCTIONS
+// Generates HTML for each upgrade
 function generateUpgradeInfo(item: Item, index: number): string {
   return `
     🎃 Growth Rate Upgrade lv. ${index + 1} | Cost: ${item.cost} Jack-o'-Lanterns
@@ -75,6 +77,7 @@ function generateUpgradeInfo(item: Item, index: number): string {
   `;
 }
 
+// Updates the on-screen game state
 function updateReportedGamestate() {
   reportedCount.innerHTML = `${lanternCounter.toFixed(2)} Jack-o'-Lanterns!`;
   reportedGrowth.innerHTML = `Current growth rate: ${lanternGrowthRate.toFixed(1)} Jack-o'-Lanterns/sec`;
@@ -82,6 +85,7 @@ function updateReportedGamestate() {
   purchasableUpgrades.innerHTML = 'PURCHASABLE UPGRADES:<br />' + availableItems.map(generateUpgradeInfo).join('');
 }
 
+// Updates lantern count and growth rate based on elapsed time
 function updateCounter(timestamp: number) {
   if (timeStamp) {
     const elapsed = timestamp - timeStamp;
@@ -93,6 +97,7 @@ function updateCounter(timestamp: number) {
   requestAnimationFrame(updateCounter);
 }
 
+// Enables or disables upgrade buttons based on affordability
 function updateButtonStatus() {
   availableItems.forEach((item, index) => {
     const button = document.querySelector(`#upgradeButton${index + 1}`) as HTMLButtonElement;
@@ -100,6 +105,7 @@ function updateButtonStatus() {
   });
 }
 
+// Creates an upgrade button for each item
 function createUpgradeButton(label: string, growth: number, index: number) {
   const button = document.createElement("button");
   button.id = `upgradeButton${index + 1}`;
@@ -110,7 +116,7 @@ function createUpgradeButton(label: string, growth: number, index: number) {
       lanternCounter -= availableItems[index].cost;
       lanternGrowthRate += growth;
       availableItems[index].sold += 1;
-      availableItems[index].cost = Math.round(availableItems[index].cost * 1.15 * 100) / 100;
+      availableItems[index].cost = Math.round(availableItems[index].cost * 1.15 * 100) / 100;  // Increase cost by 15%
       updateReportedGamestate();
       updateButtonStatus();
     }
@@ -118,12 +124,12 @@ function createUpgradeButton(label: string, growth: number, index: number) {
   return button;
 }
 
-// ===================================
-// MAIN PROGRAM
-requestAnimationFrame(updateCounter);
-updateReportedGamestate();
+// ================================
+// MAIN GAME LOGIC
+requestAnimationFrame(updateCounter);    // Start updating the counter
+updateReportedGamestate();               // Initialize display
 
-// Create page buttons
+// Create upgrade buttons for each item
 ITEM_DETAILS.forEach((item, index) => {
   const upgradeButton = createUpgradeButton(
     `BUY LV.${index + 1} UPGRADE - ${item.name}`,
@@ -133,11 +139,12 @@ ITEM_DETAILS.forEach((item, index) => {
   app.append(upgradeButton);
 });
 
+// Create a clickable button for manual lantern increment
 const clicksButton = document.createElement("button");
 Object.assign(clicksButton.style, BUTTON_STYLE);
 clicksButton.innerHTML = "BOO! Click me!";
 clicksButton.onclick = () => {
-  lanternCounter += 1;
+  lanternCounter += 1;   // Increment counter by 1 on click
   updateReportedGamestate();
 };
 
