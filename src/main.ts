@@ -27,7 +27,7 @@ const availableItems: Item[] = [
   { name: "seeds", cost: 10, rate: 0.1, sold: 0, desc: "A small busshel of pumpkin seeds...Great for beginners." },
   { name: "patch", cost: 100, rate: 2, sold: 0, desc: "A booming pumpkin patch located in Half Moon Bay California." },
   { name: "farm", cost: 1000, rate: 50, sold: 0, desc: "A well-maintained pumpkin farm, for sale from Farmer Otis." },
-  { name: "lab", cost: 2000, rate: 100, sold: 0, desc: "A cutting-edge science lab where artifically created GMO pumpkins are produced."},
+  { name: "lab", cost: 2000, rate: 100, sold: 0, desc: "A cutting-edge science lab where artificially created GMO pumpkins are produced."},
   { name: "forest", cost: 10000, rate: 1000, sold: 0, desc: "A mythical forest said to be filled with haunted spirits...and..the most delectable pumpkins."}
 ];
 
@@ -45,57 +45,23 @@ app.append(purchasableUpgrades);
 
 // ===================================
 // HELPER FUNCTIONS
+function generateUpgradeInfo(item: Item, index: number): string {
+  return `
+    🎃 Growth Rate Upgrade lv. ${index + 1} | Cost: ${item.cost} Jack-o'-Lanterns
+    <br /><em>${item.desc}</em><br />
+  `;
+}
+
 function updateReportedGamestate() {
   // Updates page elements for tracking gamestate
-  reportedCount.innerHTML = lanternCounter.toFixed(2) + " Jack-o'-Lanterns!";
+  reportedCount.innerHTML = `${lanternCounter.toFixed(2)} Jack-o'-Lanterns!`;
   reportedGrowth.innerHTML =
-    "Current growth rate: " +
-    lanternGrowthRate.toFixed(1) +
-    " Jack-o'-Lanterns/sec";
+    `Current growth rate: ${lanternGrowthRate.toFixed(1)} Jack-o'-Lanterns/sec`;
   reportedPurchases.innerHTML =
-    "Current purchases: [lv.1: " +
-    availableItems[0]["sold"] +
-    ", lv.2: " +
-    availableItems[1]["sold"] +
-    ", lv.3: " +
-    availableItems[2]["sold"] +
-    ", lv.4: " +
-    availableItems[3]["sold"] +
-    ", lv.5: " +
-    availableItems[4]["sold"] +
-    "]";
-  purchasableUpgrades.innerHTML =
-    "PURCHASABLE UPGRADES:" +
-    "<br />" +
-    "🎃 Growth Rate Upgrade lv. 1 | Cost: " +
-    availableItems[0]["cost"] +
-    " Jack-o'-Lanterns" +
-    "<br />" +
-    "<em>"+availableItems[0]["desc"]+"</em>"+
-    "<br />" +
-    "🎃 Growth Rate Upgrade lv. 2 | Cost: " +
-    availableItems[1]["cost"] +
-    " Jack-o'-Lanterns" +
-    "<br />" +
-    "<em>"+availableItems[1]["desc"]+"</em>"+
-    "<br />" +
-    "🎃 Growth Rate Upgrade lv. 3 | Cost: " +
-    availableItems[2]["cost"] +
-    " Jack-o'-Lanterns" + 
-    "<br />" +
-    "<em>"+availableItems[2]["desc"]+"</em>"+
-    "<br />" +
-    "🎃 Growth Rate Upgrade lv. 4 | Cost: " +
-    availableItems[3]["cost"] +
-    " Jack-o'-Lanterns" +
-    "<br />" +
-    "<em>"+availableItems[3]["desc"]+"</em>"+
-    "<br />" +
-    "🎃 Growth Rate Upgrade lv. 5 | Cost: " +
-    availableItems[4]["cost"] +
-    " Jack-o'-Lanterns" +
-    "<br />" +
-    "<em>"+availableItems[4]["desc"]+"</em>";
+    `Current purchases: ` + availableItems.map((item, index) => `lv.${index + 1}: ${item.sold}`).join(', ');
+
+  purchasableUpgrades.innerHTML = 'PURCHASABLE UPGRADES:<br />' + 
+    availableItems.map(generateUpgradeInfo).join('');
 }
 
 function updateCounter(timestamp: number) {
@@ -113,20 +79,19 @@ function updateCounter(timestamp: number) {
 function updateButtonStatus() {
   // Keeps purchase upgrade buttons statuses updated
   const upgrades = [
-    // with current costs of each upgrade
     { button: upgradeButton1, cost: availableItems[0]["cost"] },
-    { button: upgradeButton2, cost: availableItems[1]["cost"] }, // Buttons with costs > user's current count set to DISABLED
-    { button: upgradeButton3, cost: availableItems[2]["cost"] }, // Otherwise set to ENABLED
-    { button: upgradeButton4, cost: availableItems[2]["cost"] },
-    { button: upgradeButton5, cost: availableItems[2]["cost"] },
+    { button: upgradeButton2, cost: availableItems[1]["cost"] },
+    { button: upgradeButton3, cost: availableItems[2]["cost"] },
+    { button: upgradeButton4, cost: availableItems[3]["cost"] },
+    { button: upgradeButton5, cost: availableItems[4]["cost"] },
   ];
   upgrades.forEach(({ button, cost }) => {
     button.disabled = lanternCounter < cost;
   });
 }
 
-function createUpgradeButton( // Creates an upgrade button with given:
-  label: string, // 1. label, 2. initial growth rate, 3. availableItems integer index
+function createUpgradeButton(
+  label: string, 
   growth: number,
   index: number,
 ) {
@@ -137,9 +102,8 @@ function createUpgradeButton( // Creates an upgrade button with given:
     if (lanternCounter >= availableItems[index]["cost"]) {
       lanternCounter -= availableItems[index]["cost"];
       lanternGrowthRate += growth;
-      availableItems[index]["sold"] = availableItems[index]["sold"] + 1;
-      availableItems[index]["cost"] =
-        Math.round(availableItems[index]["cost"] * 1.15 * 100) / 100;
+      availableItems[index]["sold"] += 1;
+      availableItems[index]["cost"] = Math.round(availableItems[index]["cost"] * 1.15 * 100) / 100;
       updateReportedGamestate();
       updateButtonStatus();
     }
@@ -149,37 +113,16 @@ function createUpgradeButton( // Creates an upgrade button with given:
 
 // ===================================
 // MAIN PROGRAM
-requestAnimationFrame(updateCounter); // Request animation frame for updateCounter()
-updateReportedGamestate(); // Initializng page elements for tracking gamestate
+requestAnimationFrame(updateCounter);
+updateReportedGamestate();
 
 // Create page buttons
-const upgradeButton1 = createUpgradeButton(
-  // 3 upgrade buttons with different levels
-  "BUY LV.1 UPGRADE - busshel of pumpkin seeds", // of increase in growth rate
-  0.1,
-  0,
-);
-const upgradeButton2 = createUpgradeButton(
-  "BUY LV.2 UPGRADE - pumpkin patch",
-  2,
-  1,
-);
-const upgradeButton3 = createUpgradeButton(
-  "BUY LV.3 UPGRADE - huge pumpkin farm",
-  50,
-  2,
-);
-const upgradeButton4 = createUpgradeButton(
-  "BUY LV.4 UPGRADE - artifically created pumpkin lab",
-  100,
-  3,
-);
-const upgradeButton5 = createUpgradeButton(
-  "BUY LV.5 UPGRADE - mythical pumpkin forest",
-  1000,
-  4,
-);
-const clicksButton = document.createElement("button"); // Main button to increase count with mouse clicks
+const upgradeButton1 = createUpgradeButton("BUY LV.1 UPGRADE - busshel of pumpkin seeds", 0.1, 0);
+const upgradeButton2 = createUpgradeButton("BUY LV.2 UPGRADE - pumpkin patch", 2, 1);
+const upgradeButton3 = createUpgradeButton("BUY LV.3 UPGRADE - huge pumpkin farm", 50, 2);
+const upgradeButton4 = createUpgradeButton("BUY LV.4 UPGRADE - artificially created pumpkin lab", 100, 3);
+const upgradeButton5 = createUpgradeButton("BUY LV.5 UPGRADE - mythical pumpkin forest", 1000, 4);
+const clicksButton = document.createElement("button");
 clicksButton.style.backgroundImage = "url('images/jackolantern.png')";
 clicksButton.style.backgroundSize = "contain";
 clicksButton.style.backgroundRepeat = "no-repeat";
