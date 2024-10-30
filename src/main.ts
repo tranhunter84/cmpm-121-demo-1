@@ -13,11 +13,36 @@ app.append(header);
 // ================================
 // GAME CONFIGURATION AND CONSTANTS
 const ITEM_DETAILS = [
-  { name: "seeds", cost: 10, rate: 0.1, desc: "A small bushel of pumpkin seeds... Great for beginners." },
-  { name: "patch", cost: 100, rate: 2, desc: "A booming pumpkin patch located in Half Moon Bay, California." },
-  { name: "farm", cost: 1000, rate: 50, desc: "A well-maintained pumpkin farm, for sale from Farmer Otis." },
-  { name: "lab", cost: 2000, rate: 100, desc: "A cutting-edge science lab where GMO pumpkins are produced." },
-  { name: "forest", cost: 10000, rate: 1000, desc: "A mythical forest filled with haunted spirits... and the best pumpkins." }
+  {
+    name: "seeds",
+    cost: 10,
+    rate: 0.1,
+    desc: "A small bushel of pumpkin seeds... Great for beginners.",
+  },
+  {
+    name: "patch",
+    cost: 100,
+    rate: 2,
+    desc: "A booming pumpkin patch located in Half Moon Bay, California.",
+  },
+  {
+    name: "farm",
+    cost: 1000,
+    rate: 50,
+    desc: "A well-maintained pumpkin farm, for sale from Farmer Otis.",
+  },
+  {
+    name: "lab",
+    cost: 2000,
+    rate: 100,
+    desc: "A cutting-edge science lab where GMO pumpkins are produced.",
+  },
+  {
+    name: "forest",
+    cost: 10000,
+    rate: 1000,
+    desc: "A mythical forest filled with haunted spirits... and the best pumpkins.",
+  },
 ];
 
 const BUTTON_STYLE = {
@@ -32,14 +57,14 @@ const BUTTON_STYLE = {
   color: "white",
   fontSize: "16px",
   textAlign: "center",
-  paddingTop: "70px"
+  paddingTop: "70px",
 };
 
 // ================================
 // INITIAL GAME STATE VARIABLES
-let lanternCounter: number = 0,      // Current number of lanterns
-    lanternGrowthRate: number = 0;   // Growth rate of lanterns per second
-let timeStamp: number = 0;           // Timestamp for tracking elapsed time
+let lanternCounter: number = 0, // Current number of lanterns
+  lanternGrowthRate: number = 0; // Growth rate of lanterns per second
+let timeStamp: number = 0; // Timestamp for tracking elapsed time
 
 interface Item {
   name: string;
@@ -49,17 +74,17 @@ interface Item {
   desc: string;
 }
 
-const availableItems: Item[] = ITEM_DETAILS.map(item => ({
+const availableItems: Item[] = ITEM_DETAILS.map((item) => ({
   ...item,
-  sold: 0   // Add 'sold' property to track number of purchases
+  sold: 0, // Add 'sold' property to track number of purchases
 }));
 
 // ================================
 // GAME STATE DISPLAY ELEMENTS
-const reportedCount = document.createElement("div");         // Displays lantern count
-const reportedGrowth = document.createElement("div");        // Displays growth rate
-const reportedPurchases = document.createElement("div");     // Displays item purchases
-const purchasableUpgrades = document.createElement("div");   // Displays available upgrades
+const reportedCount = document.createElement("div"); // Displays lantern count
+const reportedGrowth = document.createElement("div"); // Displays growth rate
+const reportedPurchases = document.createElement("div"); // Displays item purchases
+const purchasableUpgrades = document.createElement("div"); // Displays available upgrades
 
 app.appendChild(document.createElement("div")).innerHTML = "🎃";
 app.append(reportedCount);
@@ -81,8 +106,14 @@ function generateUpgradeInfo(item: Item, index: number): string {
 function updateReportedGamestate() {
   reportedCount.innerHTML = `${lanternCounter.toFixed(2)} Jack-o'-Lanterns!`;
   reportedGrowth.innerHTML = `Current growth rate: ${lanternGrowthRate.toFixed(1)} Jack-o'-Lanterns/sec`;
-  reportedPurchases.innerHTML = `Current purchases: ` + availableItems.map((item, index) => `lv.${index + 1}: ${item.sold}`).join(', ');
-  purchasableUpgrades.innerHTML = 'PURCHASABLE UPGRADES:<br />' + availableItems.map(generateUpgradeInfo).join('');
+  reportedPurchases.innerHTML =
+    `Current purchases: ` +
+    availableItems
+      .map((item, index) => `lv.${index + 1}: ${item.sold}`)
+      .join(", ");
+  purchasableUpgrades.innerHTML =
+    "PURCHASABLE UPGRADES:<br />" +
+    availableItems.map(generateUpgradeInfo).join("");
 }
 
 // Updates lantern count and growth rate based on elapsed time
@@ -100,7 +131,9 @@ function updateCounter(timestamp: number) {
 // Enables or disables upgrade buttons based on affordability
 function updateButtonStatus() {
   availableItems.forEach((item, index) => {
-    const button = document.querySelector(`#upgradeButton${index + 1}`) as HTMLButtonElement;
+    const button = document.querySelector(
+      `#upgradeButton${index + 1}`,
+    ) as HTMLButtonElement;
     button.disabled = lanternCounter < item.cost;
   });
 }
@@ -116,7 +149,8 @@ function createUpgradeButton(label: string, growth: number, index: number) {
       lanternCounter -= availableItems[index].cost;
       lanternGrowthRate += growth;
       availableItems[index].sold += 1;
-      availableItems[index].cost = Math.round(availableItems[index].cost * 1.15 * 100) / 100;  // Increase cost by 15%
+      availableItems[index].cost =
+        Math.round(availableItems[index].cost * 1.15 * 100) / 100; // Increase cost by 15%
       updateReportedGamestate();
       updateButtonStatus();
     }
@@ -126,15 +160,15 @@ function createUpgradeButton(label: string, growth: number, index: number) {
 
 // ================================
 // MAIN GAME LOGIC
-requestAnimationFrame(updateCounter);    // Start updating the counter
-updateReportedGamestate();               // Initialize display
+requestAnimationFrame(updateCounter); // Start updating the counter
+updateReportedGamestate(); // Initialize display
 
 // Create upgrade buttons for each item
 ITEM_DETAILS.forEach((item, index) => {
   const upgradeButton = createUpgradeButton(
     `BUY LV.${index + 1} UPGRADE - ${item.name}`,
     item.rate,
-    index
+    index,
   );
   app.append(upgradeButton);
 });
@@ -144,7 +178,7 @@ const clicksButton = document.createElement("button");
 Object.assign(clicksButton.style, BUTTON_STYLE);
 clicksButton.innerHTML = "BOO! Click me!";
 clicksButton.onclick = () => {
-  lanternCounter += 1;   // Increment counter by 1 on click
+  lanternCounter += 1; // Increment counter by 1 on click
   updateReportedGamestate();
 };
 
